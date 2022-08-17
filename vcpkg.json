@@ -7,6 +7,7 @@
   "dependencies": [
     "boost-atomic",
     "boost-stl-interfaces",
+    "glm",
     "rsm-binary-io",
     "simpleini",
     "span-lite",
