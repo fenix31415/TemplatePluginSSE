@@ -8,6 +8,7 @@
     "boost-atomic",
     "boost-stl-interfaces",
     "glm",
+		"jsoncpp",
     "rsm-binary-io",
     "simpleini",
     "span-lite",
