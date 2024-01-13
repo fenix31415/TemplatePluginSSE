@@ -1,2 +1,2 @@
-cmake --preset=default-utils -B build -S .
+cmake --preset=default -B build -S .
 pause
