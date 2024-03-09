@@ -8,6 +8,11 @@
     "boost-atomic",
     "boost-stl-interfaces",
     "glm",
+    {
+      "name" : "imgui",
+      "features": [ "win32-binding", "dx11-binding" ]
+    },
+		"jsoncpp",
 		"magic-enum",
     "rsm-binary-io",
     "simpleini",

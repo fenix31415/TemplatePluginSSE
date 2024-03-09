@@ -81,6 +81,7 @@ else ()
 endif ()
 
 find_package(spdlog REQUIRED CONFIG)
+find_package(imgui REQUIRED CONFIG)
 
 # ---- Add source files ----
 
@@ -133,6 +134,7 @@ target_link_libraries(
 	PRIVATE
 		CommonLibSSE::CommonLibSSE
 		spdlog::spdlog
+		imgui::imgui
 )
 
 if (DEFINED UseUselessUtils AND UseUselessUtils)
@@ -202,3 +204,14 @@ target_precompile_headers(
 	PRIVATE
 		src/PCH.h
 )
+
+set_from_environment(SKYRIM_DATA)
+if (DEFINED SKYRIM_DATA)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${PROJECT_NAME}> ${SKYRIM_DATA}"/skse/plugins/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_PDB_FILE:${PROJECT_NAME}> ${SKYRIM_DATA}"/skse/plugins/"
+  )
+else()
+  message("Set SKYRIM_DATA env var to auto-copy dll+pdb")
+endif()

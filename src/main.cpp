@@ -45,11 +45,59 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	return true;
 }
 
+namespace Gui
+{
+	bool enable = false;
+	bool hidden = true;
+
+	void flip_enable()
+	{
+		enable = !enable;
+		ImGui::GetIO().MouseDrawCursor = enable && !hidden;
+	}
+
+	void flip_hidden()
+	{
+		hidden = !hidden;
+		ImGui::GetIO().MouseDrawCursor = enable && !hidden;
+	}
+
+	const uint32_t enable_hotkey = 199;  // home
+	const uint32_t hide_hotkey = 207;    // end
+
+	void Process(const RE::ButtonEvent* button)
+	{
+		if (button->IsPressed() && button->IsDown()) {
+			if (button->GetIDCode() == enable_hotkey) {
+				flip_enable();
+			}
+			if (button->GetIDCode() == hide_hotkey) {
+				flip_hidden();
+			}
+		}
+	}
+
+	void show()
+	{
+		if (!hidden) {
+			ImGui::ShowDemoWindow();
+		}
+	}
+
+	bool skipevents() { return enable && !hidden; }
+
+	using ImGuiHook = ImguiUtils::ImGuiHooks<Process, show, skipevents>;
+}
+
 static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
+	DebugRender::OnMessage(message);
+
 	switch (message->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
 		//
+
+		Gui::ImGuiHook::Initialize();
 
 		break;
 	}
@@ -67,6 +115,8 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	SKSE::Init(a_skse);
 	SKSE::AllocTrampoline(1 << 10);
+
+	DebugRender::UpdateHooks::Hook();
 
 	g_messaging->RegisterListener("SKSE", SKSEMessageHandler);
 
