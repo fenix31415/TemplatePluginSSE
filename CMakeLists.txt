@@ -1,3 +1,6 @@
+option(WITH_IMGUI "Add ImGui support" ON)
+option(WITH_DRAWING "Add Debug render support" ON)
+
 cmake_minimum_required(VERSION 3.21)
 
 # ---- Cache build vars ----
@@ -71,6 +74,13 @@ if (DEFINED UseUselessUtils AND UseUselessUtils)
 	add_compile_definitions(USELESS_UTILS)
 endif ()
 
+if (WITH_IMGUI)
+	add_compile_definitions(WITH_IMGUI)
+endif ()
+if (WITH_DRAWING)
+	add_compile_definitions(WITH_DRAWING)
+endif ()
+
 
 # ---- Dependencies ----
 
@@ -81,7 +91,10 @@ else ()
 endif ()
 
 find_package(spdlog REQUIRED CONFIG)
-find_package(imgui REQUIRED CONFIG)
+
+if (WITH_IMGUI)
+	find_package(imgui REQUIRED CONFIG)
+endif ()
 
 # ---- Add source files ----
 
@@ -134,8 +147,15 @@ target_link_libraries(
 	PRIVATE
 		CommonLibSSE::CommonLibSSE
 		spdlog::spdlog
-		imgui::imgui
 )
+
+if (WITH_IMGUI)
+	target_link_libraries(
+		${PROJECT_NAME}
+		PRIVATE
+			imgui::imgui
+	)
+endif ()
 
 if (DEFINED UseUselessUtils AND UseUselessUtils)
 	target_link_libraries(

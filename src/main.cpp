@@ -45,59 +45,77 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	return true;
 }
 
+#ifdef WITH_IMGUI
 namespace Gui
 {
-	bool enable = false;
-	bool hidden = true;
-
-	void flip_enable()
+	namespace Impl
 	{
-		enable = !enable;
-		ImGui::GetIO().MouseDrawCursor = enable && !hidden;
+		const uint32_t enable_hotkey = 199;  // home
+		const uint32_t hide_hotkey = 207;    // end
+
+		bool is_hide_hotkey(RE::ButtonEvent* b) { return b->GetIDCode() == hide_hotkey; }
+		bool is_enable_hotkey(RE::ButtonEvent* b) { return b->GetIDCode() == enable_hotkey; }
+
+		void show() { ImGui::ShowDemoWindow(); }
 	}
 
-	void flip_hidden()
+	void init()
 	{
-		hidden = !hidden;
-		ImGui::GetIO().MouseDrawCursor = enable && !hidden;
+		using ImGuiHelper = ImguiUtils::ImGuiHelper<Impl::show, Impl::is_hide_hotkey, Impl::is_enable_hotkey>;
+
+		ImGuiHelper::Initialize();
 	}
-
-	const uint32_t enable_hotkey = 199;  // home
-	const uint32_t hide_hotkey = 207;    // end
-
-	void Process(const RE::ButtonEvent* button)
-	{
-		if (button->IsPressed() && button->IsDown()) {
-			if (button->GetIDCode() == enable_hotkey) {
-				flip_enable();
-			}
-			if (button->GetIDCode() == hide_hotkey) {
-				flip_hidden();
-			}
-		}
-	}
-
-	void show()
-	{
-		if (!hidden) {
-			ImGui::ShowDemoWindow();
-		}
-	}
-
-	bool skipevents() { return enable && !hidden; }
-
-	using ImGuiHook = ImguiUtils::ImGuiHooks<Process, show, skipevents>;
 }
+#endif  // WITH_IMGUI
+
+#ifdef WITH_DRAWING
+class DrawThingsHook
+{
+public:
+	static void Hook()
+	{
+		_UpdatePlayer = REL::Relocation<uintptr_t>(REL::ID(RE::VTABLE_PlayerCharacter[0])).write_vfunc(0xad, UpdatePlayer);
+		_UpdateCharacter = REL::Relocation<uintptr_t>(REL::ID(RE::VTABLE_Character[0])).write_vfunc(0xad, UpdateCharacter);
+	}
+
+private:
+	static void Draw([[maybe_unused]] RE::Actor* a, [[maybe_unused]] float delta) {}
+
+	static void UpdatePlayer(RE::PlayerCharacter* a, float delta)
+	{
+		draw_line0(a->GetPosition(), a->GetPosition() + RE::NiPoint3{ 0, 200, 0 });
+
+		_UpdatePlayer(a, delta);
+		Draw(a, delta);
+	}
+
+	static void UpdateCharacter(RE::Character* a, float delta)
+	{
+		_UpdateCharacter(a, delta);
+		Draw(a, delta);
+	}
+
+	static inline REL::Relocation<decltype(UpdatePlayer)> _UpdatePlayer;
+	static inline REL::Relocation<decltype(UpdateCharacter)> _UpdateCharacter;
+};
+#endif  // WITH_DRAWING
 
 static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 {
-	DebugRender::OnMessage(message);
+#ifdef WITH_DRAWING
+	DebugRenderUtils::OnMessage(message);
+#endif  // WITH_DRAWING
 
 	switch (message->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
 		//
 
-		Gui::ImGuiHook::Initialize();
+#ifdef WITH_DRAWING
+		DrawThingsHook::Hook();
+#endif  // WITH_DRAWING
+#ifdef WITH_IMGUI
+		Gui::init();
+#endif  // WITH_IMGUI
 
 		break;
 	}
@@ -116,7 +134,9 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	SKSE::Init(a_skse);
 	SKSE::AllocTrampoline(1 << 10);
 
-	DebugRender::UpdateHooks::Hook();
+#ifdef WITH_DRAWING
+	DebugRenderUtils::UpdateHooks::Hook();
+#endif  // WITH_DRAWING
 
 	g_messaging->RegisterListener("SKSE", SKSEMessageHandler);
 
