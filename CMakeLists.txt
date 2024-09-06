@@ -3,6 +3,9 @@ option(WITH_DRAWING "Add Debug render support" ON)
 
 cmake_minimum_required(VERSION 3.21)
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+set(CMAKE_INTERPRODECURAL_OPTIMIZATION_DEBUG OFF)
+
 # ---- Cache build vars ----
 
 macro(set_from_environment VARIABLE)
