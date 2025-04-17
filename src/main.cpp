@@ -121,6 +121,17 @@ static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message)
 	}
 }
 
+#ifdef SKYRIM_SUPPORT_AE
+extern "C" DLLEXPORT constexpr auto SKSEPlugin_Version = []() {
+	SKSE::PluginVersionData v{};
+	v.pluginVersion = Version::MAJOR;
+	v.PluginName("FenixTemplatePlugin"sv);
+	v.AuthorName("fenix31415"sv);
+	v.CompatibleVersions({ SKSE::RUNTIME_1_6_318, { 1, 6, 1170 } });
+	return v;
+}();
+#endif
+
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
 	auto g_messaging = reinterpret_cast<SKSE::MessagingInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kMessaging));

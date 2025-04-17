@@ -1,5 +1,6 @@
 option(WITH_IMGUI "Add ImGui support" ON)
 option(WITH_DRAWING "Add Debug render support" ON)
+option(SKYRIM_SUPPORT_AE "doi ae" OFF)
 
 cmake_minimum_required(VERSION 3.21)
 
@@ -89,6 +90,10 @@ if (DEFINED UseUselessUtils AND UseUselessUtils)
 else ()
 	add_subdirectory($ENV{CommonLibSSE} ./CommonLibSSE/build)
 endif ()
+
+if(SKYRIM_SUPPORT_AE)
+	add_compile_definitions(SKYRIM_SUPPORT_AE)
+endif(SKYRIM_SUPPORT_AE)
 
 find_package(spdlog REQUIRED CONFIG)
 
