@@ -91,6 +91,19 @@
     },
     {
       "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX $penv{CXXFLAGS}"
+      },
+      "generator": "Visual Studio 18 2026",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows"
+      ],
+      "name": "vs2026-windows-vcpkg",
+      "toolset": "v145"
+    },
+    {
+      "cacheVariables": {
         "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
       "generator": "Visual Studio 16 2019",
@@ -101,7 +114,8 @@
         "windows"
       ],
       "name": "vs2019-windows-vcpkg-vr"
-    },    {
+    },
+    {
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /external:anglebrackets /external:W0 $penv{CXXFLAGS}"
       },
