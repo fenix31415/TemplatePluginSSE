@@ -7,12 +7,21 @@
   "dependencies": [
     "boost-atomic",
     "boost-stl-interfaces",
+    "commonlib-shared",
     "glm",
 		"magic-enum",
     "rsm-binary-io",
     "simpleini",
     "span-lite",
     "spdlog",
-    "xbyak"
+    "xbyak",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
   ]
 }

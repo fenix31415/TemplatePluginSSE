@@ -1,0 +1,18 @@
+{
+  "name": "commonlib-shared",
+  "version": "1.0.0",
+  "description": "Shared library for Skyrim modding",
+  "homepage": "https://github.com/CommonLibSSE/commonlib-shared",
+  "dependencies": [
+    {
+        "name": "spdlog",
+        "default-features": false,
+        "features": [
+            "wchar"
+        ]
+    },
+    "fmt",
+    "vcpkg-cmake",
+    "vcpkg-cmake-config"
+  ]
+}
